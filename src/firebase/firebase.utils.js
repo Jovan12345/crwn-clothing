@@ -23,10 +23,10 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     if (!snapShot.exists) {
         const { displayName, email } = userAuth;
         const createdAt = new Date();
-        
+
         try {
             await userRef.set({
-                displayName, 
+                displayName,
                 email,
                 createdAt,
                 ...additionalData
@@ -51,9 +51,9 @@ export const addCollectionAndDocuments = async (collectionKey, objectToAdd) => {
     return await batch.commit();
 }
 
-export const convertCollectionsSnapshotToMap = (collections) =>{
-    const transformedCollection = collections.docs.map( doc =>{
-        const {title, items} = doc.data();
+export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformedCollection = collections.docs.map(doc => {
+        const { title, items } = doc.data();
 
         return {
             routeName: encodeURI(title.toLowerCase()),
@@ -67,6 +67,15 @@ export const convertCollectionsSnapshotToMap = (collections) =>{
         accumulator[collection.title.toLowerCase()] = collection;
         return accumulator;
     }, {})
+};
+
+export const getCurrentUser = () => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = auth.onAuthStateChanged(userAuth => {
+            unsubscribe();
+            resolve(userAuth);
+        }, reject)
+    })
 }
 
 firebase.initializeApp(config);
